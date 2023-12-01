@@ -1,9 +1,36 @@
 nav {
 
-    margin-left: 1.5rem;
-    margin-right: 1.5rem; 
+    margin-left: 0;
+    margin-right: 0; 
     font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
     font-weight: bold;
-    padding: 1rem 1rem;
+    padding: 0!important 
     
 }
+
+body {
+    padding: 0;
+    margin: 0;
+
+}
+
+#fetch-button {
+    background-color: aqua;
+}
+
+#city-forecast {
+    margin-top: 15px;
+    margin-left: 10px;
+    justify-content: center;
+}
+
+#recent-searches {
+    margin-left: 30px;
+    margin-right: 30px;
+    margin-top: 15px;
+}
+
+#single-day-forecast {
+    display: flex;
+}
+
