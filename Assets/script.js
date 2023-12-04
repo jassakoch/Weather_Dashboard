@@ -4,7 +4,6 @@ let dailyForecast = document.getElementById('today-weather');
 fetchButton = document.getElementById('fetch-button');
 let inputEl = document.getElementById('user-input');
 let cityForecast = document.getElementById('city-forecast');
-let FiveDayForecast = document.getElementById('5DayForecast')
 //event listener for search button
 fetchButton.addEventListener('click', requestCity);
 fetchButton.addEventListener('click', get5DayForeast);
@@ -74,10 +73,29 @@ function requestCity(event) {
             cityForecast.appendChild(cityWindSpeed);
             cityForecast.appendChild(cityWeatherIcon);
 
+          //Saving searched city to local storage  
+            saveToLocalStorage(userInput);
+
 
         } )   
 
         }
+
+//Function to save searched city to local storage
+function saveToLocalStorage(city) {
+
+//Retrieve existing search history from local storage
+let searchHistory = JSON.parse(localStorage.getItem ('searchHistory')) || [];
+
+//Add the new city to the search history
+searchHistory.push(city);
+
+//Save the updated search history back in local storage
+localStorage.setItem('searchHistory', JSON.stringify(searchHistory));
+}
+
+
+
 //Function for the 5 Day Forecast
 
 function get5DayForeast (event) {
@@ -98,28 +116,36 @@ fetch(forecastURL)
 .then(function (data) {
   console.log(data);
 
-//Clear the contents of 5 day forecast container
-FiveDayForecast.textContent = "";
+
 
 // Looping through data to get daily forecast, currently data is set to 3 hours, so have to  go by increments of 8
 for (var i = 0; i < data.list.length; i += 8) {
     console.log(data.list[i]);
     //Take data re date, temp, humidity, windspeed and weather icon from weather API
 let forecastDate = dayjs.unix(data.list[i].dt).format('MMMM D, YYYY');
-let forecastTemp = data.list[i].main.temp;
-let forecastHumidity = data.list[i].main.humidity;
-let forecastWindSpeed = data.list[i].wind.speed;
-let forecastIcon = data.list[i].weather.icon;
+let forecastTemp = 'Temp: ' +  data.list[i].main.temp + 'C°'
+let forecastHumidity = 'Humidity: ' + data.list[i].main.humidity;
+let forecastWindSpeed = 'Wind: ' + data.list[i].wind.speed;
+let forecastIcon = src = "https://openweathermap.org/img/wn/" + data.list[i].weather[0].icon + "@2x.png";
 
 //Identify exisint elements in HTML to append to
 let forecastDateEl = document.getElementById('forecast-date-' + i);
+let forecastTempEl = document.getElementById('forecast-temp-' + i);
+let forecastWindEl = document.getElementById('forecast-wind-' + i);
+let forecastHumidityEl = document.getElementById('forecast-hum-' + i);
+let forecastIconEl = document.getElementById('forecast-icon-' + i);
+
 
 //Update content to html elements
 forecastDateEl.textContent = forecastDate;
-
+forecastTempEl.textContent = forecastTemp;
+forecastWindEl.textContent = forecastWindSpeed;
+forecastHumidityEl.textContent = forecastHumidity;
+forecastIconEl.src = forecastIcon;
 }
 })}
 
 
+//
 
 
