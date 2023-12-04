@@ -17,7 +17,7 @@ function requestCity(event) {
         alert('City Name Required');
         return
     }
-    event.preventDefault();
+
 
     //clear previous content in cityForecast
     cityForecast.innerHTML = '';
@@ -144,7 +144,6 @@ function get5DayForeast(event) {
         })
 }
 
-
 //Function to display the search history from local storage
 function displaySearchHistory() {
 
@@ -178,18 +177,6 @@ function displaySearchHistory() {
 
     //Append history card to the recent-searches element
     recentSearchesEl.appendChild(historyCard);
-
-//Adding eventListener to search history list 
-recentSearchesEl.addEventListener('click', function (event) {
-    if (event.target.tagName ==='LI') {
-        //Get city name 
-        let cityName = event.target.textContent;
-
-        //Fetch the weather forecast for the selected city
-        requestCity(cityName);
-        get5DayForeast(cityName);
-    }
-})
 
 }
 
