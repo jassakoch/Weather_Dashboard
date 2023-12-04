@@ -4,6 +4,8 @@ let dailyForecast = document.getElementById('today-weather');
 fetchButton = document.getElementById('fetch-button');
 let inputEl = document.getElementById('user-input');
 let cityForecast = document.getElementById('city-forecast');
+//Retrieve existing search history from local storage
+let searchHistory = JSON.parse(localStorage.getItem('searchHistory')) || [];
 //event listener for search button
 fetchButton.addEventListener('click', requestCity);
 fetchButton.addEventListener('click', get5DayForeast);
@@ -73,32 +75,28 @@ function requestCity(event) {
             cityForecast.appendChild(cityWindSpeed);
             cityForecast.appendChild(cityWeatherIcon);
 
-          //Saving searched city to local storage  
+            //Saving searched city to local storage  
             saveToLocalStorage(userInput);
 
 
-        } )   
+        })
 
-        }
+}
 
 //Function to save searched city to local storage
 function saveToLocalStorage(city) {
 
-//Retrieve existing search history from local storage
-let searchHistory = JSON.parse(localStorage.getItem ('searchHistory')) || [];
+    //Add the new city to the search history
+    searchHistory.push(city);
 
-//Add the new city to the search history
-searchHistory.push(city);
-
-//Save the updated search history back in local storage
-localStorage.setItem('searchHistory', JSON.stringify(searchHistory));
+    //Save the updated search history back in local storage
+    localStorage.setItem('searchHistory', JSON.stringify(searchHistory));
 }
 
 
 
 //Function for the 5 Day Forecast
-
-function get5DayForeast (event) {
+function get5DayForeast(event) {
     let userInput = inputEl.value.trim();
     if (!userInput) {
         alert('City Name Required');
@@ -106,46 +104,93 @@ function get5DayForeast (event) {
     }
     event.preventDefault();
 
-let forecastURL = "https://api.openweathermap.org/data/2.5/forecast?q=" + userInput + "&appid=" + APIKEY + "&units=metric";
+    let forecastURL = "https://api.openweathermap.org/data/2.5/forecast?q=" + userInput + "&appid=" + APIKEY + "&units=metric";
 
-       // Fetch forecastData
-fetch(forecastURL)
-.then(function (response) {
-  return response.json();
-})
-.then(function (data) {
-  console.log(data);
-
-
-
-// Looping through data to get daily forecast, currently data is set to 3 hours, so have to  go by increments of 8
-for (var i = 0; i < data.list.length; i += 8) {
-    console.log(data.list[i]);
-    //Take data re date, temp, humidity, windspeed and weather icon from weather API
-let forecastDate = dayjs.unix(data.list[i].dt).format('MMMM D, YYYY');
-let forecastTemp = 'Temp: ' +  data.list[i].main.temp + 'C°'
-let forecastHumidity = 'Humidity: ' + data.list[i].main.humidity;
-let forecastWindSpeed = 'Wind: ' + data.list[i].wind.speed;
-let forecastIcon = src = "https://openweathermap.org/img/wn/" + data.list[i].weather[0].icon + "@2x.png";
-
-//Identify exisint elements in HTML to append to
-let forecastDateEl = document.getElementById('forecast-date-' + i);
-let forecastTempEl = document.getElementById('forecast-temp-' + i);
-let forecastWindEl = document.getElementById('forecast-wind-' + i);
-let forecastHumidityEl = document.getElementById('forecast-hum-' + i);
-let forecastIconEl = document.getElementById('forecast-icon-' + i);
+    // Fetch forecastData
+    fetch(forecastURL)
+        .then(function (response) {
+            return response.json();
+        })
+        .then(function (data) {
+            console.log(data);
 
 
-//Update content to html elements
-forecastDateEl.textContent = forecastDate;
-forecastTempEl.textContent = forecastTemp;
-forecastWindEl.textContent = forecastWindSpeed;
-forecastHumidityEl.textContent = forecastHumidity;
-forecastIconEl.src = forecastIcon;
+
+            // Looping through data to get daily forecast, currently data is set to 3 hours, so have to  go by increments of 8
+            for (var i = 0; i < data.list.length; i += 8) {
+                console.log(data.list[i]);
+                //Take data re date, temp, humidity, windspeed and weather icon from weather API
+                let forecastDate = dayjs.unix(data.list[i].dt).format('MMMM D, YYYY');
+                let forecastTemp = 'Temp: ' + data.list[i].main.temp + 'C°'
+                let forecastHumidity = 'Humidity: ' + data.list[i].main.humidity;
+                let forecastWindSpeed = 'Wind: ' + data.list[i].wind.speed;
+                let forecastIcon = src = "https://openweathermap.org/img/wn/" + data.list[i].weather[0].icon + "@2x.png";
+
+                //Identify exisint elements in HTML to append to
+                let forecastDateEl = document.getElementById('forecast-date-' + i);
+                let forecastTempEl = document.getElementById('forecast-temp-' + i);
+                let forecastWindEl = document.getElementById('forecast-wind-' + i);
+                let forecastHumidityEl = document.getElementById('forecast-hum-' + i);
+                let forecastIconEl = document.getElementById('forecast-icon-' + i);
+
+
+                //Update content to html elements
+                forecastDateEl.textContent = forecastDate;
+                forecastTempEl.textContent = forecastTemp;
+                forecastWindEl.textContent = forecastWindSpeed;
+                forecastHumidityEl.textContent = forecastHumidity;
+                forecastIconEl.src = forecastIcon;
+            }
+        })
 }
-})}
 
 
-//
+//Function to display the search history from local storage
+function displaySearchHistory() {
+
+    //Get the HTML element with id 'recent-searches'
+    let recentSearchesEl = document.getElementById('recent-searches');
+
+    //create a new card for search history
+    let historyCard = document.createElement('div');
+    historyCard.className = 'card bg-primary';
+
+    //create card body
+    let cardBody = document.createElement('div');
+    cardBody.className = 'card-body text-center';
+
+    //create a list to display search history
+    let historyList = document.createElement('ul');
+
+    //Looping through search history to create list of iterms
+    searchHistory.forEach((city, index) => {
+        let listItem = document.createElement('li');
+        listItem.textContent = city;
+        historyList.appendChild(listItem);
+    });
+
+    //Append historyy list to card body
+    cardBody.appendChild(historyList);
 
 
+    //Append card body to the card
+    historyCard.appendChild(cardBody);
+
+    //Append history card to the recent-searches element
+    recentSearchesEl.appendChild(historyCard);
+
+//Adding eventListener to search history list 
+recentSearchesEl.addEventListener('click', function (event) {
+    if (event.target.tagName ==='LI') {
+        //Get city name 
+        let cityName = event.target.textContent;
+
+        //Fetch the weather forecast for the selected city
+        requestCity(cityName);
+        get5DayForeast(cityName);
+    }
+})
+
+}
+
+displaySearchHistory();
